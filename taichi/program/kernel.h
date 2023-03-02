@@ -71,6 +71,7 @@ class TI_DLL_EXPORT Kernel : public Callable {
     // |owned_ctx_| will be nullptr.
     // Invariant: |ctx_| will never be nullptr.
     RuntimeContext *ctx_;
+    std::unique_ptr<char[]> arg_buffer_;
     std::unique_ptr<char[]> result_buffer_;
   };
 

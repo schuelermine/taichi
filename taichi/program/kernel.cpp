@@ -81,24 +81,38 @@ Kernel::LaunchContextBuilder::LaunchContextBuilder(Kernel *kernel,
     : kernel_(kernel),
       owned_ctx_(nullptr),
       ctx_(ctx),
+      arg_buffer_(std::make_unique<char[]>(
+          arch_uses_llvm(kernel->program->compile_config().arch)
+              ? kernel->args_size
+              : sizeof(uint64) * taichi_max_num_args_total)),
       result_buffer_(std::make_unique<char[]>(
           arch_uses_llvm(kernel->program->compile_config().arch)
               ? kernel->ret_size
               : sizeof(uint64) * taichi_result_buffer_entries)) {
   ctx_->result_buffer = (uint64 *)result_buffer_.get();
   ctx_->result_buffer_size = kernel->ret_size;
+  ctx_->arg_buffer_size = kernel->args_size;
+  ctx_->arg_buffer = arg_buffer_.get();
+  ctx_->args_type = kernel->args_type;
 }
 
 Kernel::LaunchContextBuilder::LaunchContextBuilder(Kernel *kernel)
     : kernel_(kernel),
       owned_ctx_(std::make_unique<RuntimeContext>()),
       ctx_(owned_ctx_.get()),
+      arg_buffer_(std::make_unique<char[]>(
+          arch_uses_llvm(kernel->program->compile_config().arch)
+              ? kernel->args_size
+              : sizeof(uint64) * taichi_max_num_args_total)),
       result_buffer_(std::make_unique<char[]>(
           arch_uses_llvm(kernel->program->compile_config().arch)
               ? kernel->ret_size
               : sizeof(uint64) * taichi_result_buffer_entries)) {
   ctx_->result_buffer = (uint64 *)result_buffer_.get();
   ctx_->result_buffer_size = kernel->ret_size;
+  ctx_->arg_buffer_size = kernel->args_size;
+  ctx_->arg_buffer = arg_buffer_.get();
+  ctx_->args_type = kernel->args_type;
 }
 
 void Kernel::LaunchContextBuilder::set_arg_float(int arg_id, float64 d) {
